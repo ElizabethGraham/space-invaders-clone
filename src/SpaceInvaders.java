@@ -15,7 +15,7 @@ public class Lab4 {
     public static final int PATROL_SIZE = 20;
     public static final Color PATROL_COLOR = Color.GREEN;
     // Enemy Variables
-    public static final int ENEMY_Y = 20;
+    public static int enemyY = 20;
     public static int enemyX = 0;
     public static boolean enemyDirection = true; // True == Right, False == Left
     public static final int ENEMY_SIZE = 30;
@@ -31,10 +31,6 @@ public class Lab4 {
     public static final int PATROL_MISSILE_LENGTH = 10;
 
     public static void main(String[] args) {
-        // Uncomment to make it look more Space Invaders-esque
-        // g.fillRect(0, 0, 300, 300);
-        // g.setColor(Color.BLACK);
-
         startGame();
     }
 
@@ -44,6 +40,11 @@ public class Lab4 {
          *
          * Also houses the main game loop *
          */
+
+        // Set the background to black
+        g.fillRect(0, 0, 300, 300);
+        g.setColor(Color.BLACK);
+
         // Init the player
         drawPatrolShip(g, PATROL_COLOR);
 
@@ -68,7 +69,7 @@ public class Lab4 {
     public static void erasePatrolShip(Graphics g) {
         // Erase the patrol ship at it's previous location
         Rectangle r = new Rectangle(patrolX, PATROL_Y, PATROL_SIZE, PATROL_SIZE);
-        g.setColor(Color.WHITE);
+        g.setColor(Color.BLACK);
         g.fillRect((int) r.getX(), (int) r.getY(), (int) r.getWidth(), (int) r.getHeight());
     }
 
@@ -98,14 +99,14 @@ public class Lab4 {
         enemyInterface ei = new enemyInterface() {
             public void erasePreviousInstance() {
                 // Erase the previous instance of the enemy
-                Rectangle r = new Rectangle(enemyX, ENEMY_Y, ENEMY_SIZE, ENEMY_SIZE);
-                g.setColor(Color.WHITE);
+                Rectangle r = new Rectangle(enemyX, enemyY, ENEMY_SIZE, ENEMY_SIZE);
+                g.setColor(Color.BLACK);
                 g.fillRect((int) r.getX(), (int) r.getY(), (int) r.getWidth(), (int) r.getHeight());
             }
 
             public void redrawEnemy() {
                 // Redraw the enemy at the new position
-                Rectangle updatedRec = new Rectangle(enemyX, ENEMY_Y, ENEMY_SIZE, ENEMY_SIZE);
+                Rectangle updatedRec = new Rectangle(enemyX, enemyY, ENEMY_SIZE, ENEMY_SIZE);
                 g.setColor(c);
                 g.fillRect((int) updatedRec.getX(), (int) updatedRec.getY(), (int) updatedRec.getWidth(),
                         (int) updatedRec.getHeight());
@@ -132,8 +133,12 @@ public class Lab4 {
         else {
             // Flip the direction
             enemyDirection = !enemyDirection;
+
             // Erase it
             ei.erasePreviousInstance();
+
+            // Increment the enemyY value
+            enemyY += 40;
 
             // Make sure it's not on the bounds
             if (enemyDirection == true) {
@@ -171,13 +176,13 @@ public class Lab4 {
         missileInterface mi = new missileInterface() {
             public void erasePreviousInstance() {
                 // Erase the missile first
-                g.setColor(Color.WHITE);
+                g.setColor(Color.BLACK);
                 g.drawLine(patrolMissileX, patrolMissileY, patrolMissileX, patrolMissileY + PATROL_MISSILE_LENGTH);
             }
 
             public void redrawMissile() {
                 // Draw it in black again
-                g.setColor(Color.BLACK);
+                g.setColor(Color.WHITE);
                 g.drawLine(patrolMissileX, patrolMissileY, patrolMissileX, patrolMissileY + PATROL_MISSILE_LENGTH);
             }
         };
@@ -259,10 +264,10 @@ public class Lab4 {
         /*
          * if patrolMissileX is between the left and right sides of enemyBounds && pMX
          * is between top and bottom: return true;
-         *
+         *  enemyY = 20
+         *  enemySize = 30
          */
-        if ((patrolMissileX >= enemyX && patrolMissileX <= enemyX + ENEMY_SIZE)
-                && (patrolMissileY <= 50 && patrolMissileY >= 20)) {
+        if ((patrolMissileX >= enemyX && patrolMissileX <= enemyX + ENEMY_SIZE) && (patrolMissileY <= enemyY+ENEMY_SIZE && patrolMissileY >= enemyY)) {
             return true;
         }
         return false;
@@ -281,5 +286,5 @@ public class Lab4 {
         g.setColor(Color.RED);
         g.drawString("YES", 110, 200);
         g.drawString("NO", 200, 200);
-     }
+    }
 }
