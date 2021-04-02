@@ -9,6 +9,7 @@ the Graphics object, setting the background color if they so choose.
 To ensure that the image is always displayed, a timer calls repaint at
 regular intervals.
 */
+package src;
 
 import java.awt.*;
 import java.awt.event.*;

@@ -1,9 +1,10 @@
-package com.company;
+package src;
 
 import java.awt.*;
 import java.awt.event.*;
 
-public class Lab4 {
+
+public class SpaceInvaders {
     // Window Class Variables
     public static final int PANEL_SIZE = 300; // Constant panel size var, width and height
     public static DrawingPanel p = new DrawingPanel(PANEL_SIZE, PANEL_SIZE); // Init Panel with proper dimensions
@@ -15,8 +16,8 @@ public class Lab4 {
     public static final int PATROL_SIZE = 20;
     public static final Color PATROL_COLOR = Color.GREEN;
     // Enemy Variables
-    public static int enemyY = 20;
-    public static int enemyX = 0;
+    public static int enemyY = 30;
+    public static int enemyX = 11;
     public static boolean enemyDirection = true; // True == Right, False == Left
     public static final int ENEMY_SIZE = 30;
     public static final Color ENEMY_COLOR = Color.RED;
@@ -48,7 +49,7 @@ public class Lab4 {
         // Init the player
         drawPatrolShip(g, PATROL_COLOR);
 
-        for (int time = 0; time <= 1000; time++) {
+        for (int time = 0; time <= 3000; time++) {
             // If the missile is in the fired state (anything greater than 0)...
             if (patrolMissileY > 0) {
                 // Update the missile
@@ -56,12 +57,17 @@ public class Lab4 {
             }
 
             if (hitDetection()) {
-                System.out.println("GAME OVER!");
+                replayPrompt();
+                break;
+            }
+
+            if (enemyY == 230 && enemyX <= patrolX+PATROL_SIZE) {
+                replayPrompt();
                 break;
             }
 
             inputListener(p, g);
-            p.sleep(50);
+            p.sleep(10);
             updateEnemyShip(g, ENEMY_COLOR);
         }
     }
@@ -81,18 +87,16 @@ public class Lab4 {
     }
 
     interface enemyInterface {
+        // Submethods used in updateEnemyShip
         void erasePreviousInstance();
-
         void redrawEnemy();
     }
 
     public static void updateEnemyShip(Graphics g, Color c) {
         /**
-         * Draws the enemy ship first in white, then increment enemyX by 1, and then
-         * Draws the ship again in red. Put a call to this method inside the for loop.
-         *
-         * Took a liberty and assumed it should move back and forth I didn't understand
-         * how it could work otherwise
+         * Draws the enemy ship first in black (to erase a previous instance),
+         * then increments enemyX by 1, and then it draws the ship again in
+         * red. This method is called every pass in startGame()
          */
 
         // Define the Enemy Functions
@@ -109,13 +113,13 @@ public class Lab4 {
                 Rectangle updatedRec = new Rectangle(enemyX, enemyY, ENEMY_SIZE, ENEMY_SIZE);
                 g.setColor(c);
                 g.fillRect((int) updatedRec.getX(), (int) updatedRec.getY(), (int) updatedRec.getWidth(),
-                        (int) updatedRec.getHeight());
+                              (int) updatedRec.getHeight());
             }
         };
 
         // Begin the actual enemy logic
         // If the X Position is within the bounds
-        if (enemyX <= 270 && enemyX >= 0) {
+        if (enemyX <= 260 && enemyX >= 10) {
 
             ei.erasePreviousInstance();
 
@@ -205,17 +209,7 @@ public class Lab4 {
 
     public static void inputListener(DrawingPanel panel, Graphics g) {
         /**
-         * This will call panel.getKeyCode() that returns a code for a key. It returns 0
-         * if no key has been pushed, and will return one of the above constants if the
-         * corresponding arrow key has been pushed. •The method handleKeys should do
-         * nothing if the returned key code is 0. •If the key code is RIGHT_ARROW or
-         * LEFT_ARROW, move the patrol ship to the right or left by 3 pixels, but do not
-         * let any part of the patrol ship move off the screen. To move the patrol ship:
-         * •draw the patrol ship in white (to erase the old one) •change patrolX •draw
-         * the patrol ship in green Call the method handleKeys in the loop. You should
-         * be able to move the patrol ship by pushing the left and right arrows on the
-         * keyboard. Before using the arrow keys, make sure your drawing window is the
-         * active window by clicking the mouse in this window.
+         * This function listens for player movement and action keys. It's called every
          */
 
         int keyCode = panel.getKeyCode();
@@ -230,7 +224,7 @@ public class Lab4 {
                 break;
             case KeyEvent.VK_RIGHT:
                 // If adding 3 to patrolX won't take it out of bounds...
-                if (patrolX < 273) {
+                if (patrolX < 270) {
                     erasePatrolShip(g);
                     patrolX += 3;
                     drawPatrolShip(g, PATROL_COLOR);
@@ -249,42 +243,76 @@ public class Lab4 {
 
     public static boolean hitDetection() {
         /**
-         * Returns true if the current missile has hit the enemy ship and false
-         * otherwise. There is a hit if the top of the missile is inside the enemy ship.
-         * For this to happen two thing must be true: •the x value of the top of the
-         * missile must be between the left and right sides of the enemy •the y value of
-         * the top of the missile must be between the top and bottom of the enemy. At
-         * the end of the loop in startGame, set hit to true if detectHit() returns
-         * true. Modify moveEnemyShipAndDraw so that if hit is true, the enemy ship is
-         * drawn in black and does not move. In this case, display the message: Enemy
-         * ship hit! in green on a line below the patrol ship. If the enemy ship moves
-         * off the screen or time runs out, Display the message: Enemy ship got away! in
-         * red on a line below the patrol ship.
+         * Detect if the enemy ship has been hit by the player's missile
+         *
+         * Called on every update in the startGame() for loop
+         *
+         * If the missile's X coordinate is greater than or equal the enemy's X and less than or equal to the enemy's X coordinate + the enemy size. And if the missile's Y is less than or equal to enemy's Y + the enemy's size, and the missile's Y is greater than the enemyY
          */
-        /*
-         * if patrolMissileX is between the left and right sides of enemyBounds && pMX
-         * is between top and bottom: return true;
-         *  enemyY = 20
-         *  enemySize = 30
-         */
-        if ((patrolMissileX >= enemyX && patrolMissileX <= enemyX + ENEMY_SIZE) && (patrolMissileY <= enemyY+ENEMY_SIZE && patrolMissileY >= enemyY)) {
-            return true;
-        }
-        return false;
+        return (patrolMissileX >= enemyX && patrolMissileX <= enemyX + ENEMY_SIZE) && (patrolMissileY <= enemyY + ENEMY_SIZE && patrolMissileY >= enemyY);
     }
 
+
     public static void replayPrompt() {
-        int[] yesBounds = new int[4];
-        g.fillRect(0, 0, 300, 300);
+        /**
+         * Clear the window and prompt the user to choose to play again or not
+         */
+        // Erase the window by painting it black
         g.setColor(Color.BLACK);
+        g.fillRect(0, 0, 300, 300);
 
         // Print prompt on the screen
         g.setColor(Color.RED);
-        g.drawString("Continue?", 110, 100);
+        g.drawString("Continue?", 120, 75);
+        // Just for aesthetics
         g.setColor(Color.ORANGE);
-        g.drawString("INSERT COIN", 100, 150);
+        g.drawString("INSERT COIN", 110, 120);
+
+        // Print the Yes button (Green box, Red word)
+        g.setColor(Color.GREEN);
+        g.fillRect(0, 150, 150, 100);
         g.setColor(Color.RED);
-        g.drawString("YES", 110, 200);
-        g.drawString("NO", 200, 200);
+        g.drawString("YES", 60, 205);
+
+        // Print the No button (Red box, green word)
+        g.setColor(Color.RED);
+        g.fillRect(150, 150, 150, 100);
+        g.setColor(Color.GREEN);
+        g.drawString("NO", 220, 205);
+
+        // Loop until the user makes a selection
+        while (true) {
+            if (p.mousePressed()) {
+                // If the mouse Y coordinates are within the Yes/No buttons bounds
+                if (p.getClickY() >= 150 && p.getClickY() <= 250) {
+                    // If the mouse coordinates are within the Yes button X bounds
+                    if (p.getClickX() < 150) {
+                        // Erase everything
+                        g.setColor(Color.BLACK);
+                        g.drawString("Continue?", 120, 75);
+                        g.drawString("INSERT COIN", 110, 120);
+
+                        g.drawString("YES", 60, 205);
+                        g.drawString("NO", 220, 205);
+
+                        g.fillRect(0, 150, 150, 100);
+                        g.fillRect(150, 150, 150, 100);
+
+                        // Call to replay here
+                        /**The way this was made for the assignment (needing it
+                         * all in a single file) doesn't allow for me to
+                         * reinstantiate the variables and fully restart the
+                         * game (at least I don't think I can, the way it's set
+                         * up), so I'll have to make things more object oriented
+                         * to fix it. 
+                         */
+
+                    } else {  // If the click X position is greater than 150, quit the game
+                        System.exit(0);
+                    }
+                }
+            }
+        }
     }
 }
+
