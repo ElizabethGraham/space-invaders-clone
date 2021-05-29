@@ -59,16 +59,4 @@ public class PlayerMissile {
             mi.erasePreviousInstance();
         }
     }
-
-
-    //public boolean hitDetection() {
-        /**
-         * Detect if the enemy ship has been hit by the player's missile
-         *
-         * Called on every update in the startGame() for loop
-         *
-         * If the missile's X coordinate is greater than or equal the enemy's X and less than or equal to the enemy's X coordinate + the enemy size. And if the missile's Y is less than or equal to enemy's Y + the enemy's size, and the missile's Y is greater than the enemyY
-         */
-        //return (patrolMissileX >= Enemy.enemyX && patrolMissileX <= Enemy.enemyX + Enemy.ENEMY_SIZE) && (patrolMissileY <= Enemy.enemyY + Enemy.ENEMY_SIZE && patrolMissileY >= Enemy.enemyY);
-    //}
 }
